@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Hisab - Cyber Cafe & Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background-color: #fce4ec;
+        }
+        .hello-kitty-card {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #ff69b4;
+        }
+        .loader {
+            display: none;
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #ff69b4;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .category-pill {
+            background-color: #ffebee;
+            border: 1px solid #ff69b4;
+            color: #c51162;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-pink-600">
+                <i class="bi bi-shop"></i> Shop Hisab
+            </h1>
+            <p class="text-gray-600">Cyber Cafe & Services Account Manager</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="grid md:grid-cols-2 gap-6">
+            <!-- Service Entry Form -->
+            <div class="hello-kitty-card p-6">
+                <h2 class="text-xl font-bold text-pink-600 mb-4">
+                    <i class="bi bi-plus-circle"></i> Add Service
+                </h2>
+                <form id="serviceForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700">Service Type</label>
+                        <select id="serviceType" class="w-full p-2 border rounded-lg focus:border-pink-400 focus:outline-none" required>
+                            <option value="">Select Service</option>
+                            <option value="Photocopy">Photocopy</option>
+                            <option value="Lamination">Lamination</option>
+                            <option value="Online Form">Online Form</option>
+                            <option value="Money Transfer">Money Transfer</option>
+                            <option value="AEPS">AEPS</option>
+                            <option value="Resume">Resume</option>
+                            <option value="Cash">Cash Payment</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Description</label>
+                        <input type="text" id="description" placeholder="e.g. Aadhaar Card Copy, Job Application Form" class="w-full p-2 border rounded-lg focus:border-pink-400 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Quantity</label>
+                        <input type="number" id="quantity" class="w-full p-2 border rounded-lg focus:border-pink-400 focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700">Price per Unit</label>
+                        <input type="number" id="price" step="0.01" class="w-full p-2 border rounded-lg focus:border-pink-400 focus:outline-none" required>
+                    </div>
+                    <button type="submit" class="w-full bg-pink-500 text-white py-2 rounded-lg hover:bg-pink-600 transition">
+                        Add Entry
+                    </button>
+                </form>
+            </div>
+
+            <!-- Daily Summary -->
+            <div class="hello-kitty-card p-6">
+                <h2 class="text-xl font-bold text-pink-600 mb-4">
+                    <i class="bi bi-calendar-check"></i> Today's Summary
+                </h2>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span>Total Revenue:</span>
+                        <span id="totalRevenue" class="font-bold">₹0</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-3 bg-pink-50 rounded-lg">
+                            <h3 class="font-semibold text-pink-600">Photocopy</h3>
+                            <p id="photocopySummary">₹0</p>
+                        </div>
+                        <div class="p-3 bg-pink-50 rounded-lg">
+                            <h3 class="font-semibold text-pink-600">Lamination</h3>
+                            <p id="laminationSummary">₹0</p>
+                        </div>
+                        <div class="p-3 bg-pink-50 rounded-lg">
+                            <h3 class="font-semibold text-pink-600">Forms</h3>
+                            <p id="formsSummary">₹0</p>
+                        </div>
+                        <div class="p-3 bg-pink-50 rounded-lg">
+                            <h3 class="font-semibold text-pink-600">Transfers</h3>
+                            <p id="transfersSummary">₹0</p>
+                        </div>
+                    </div>
+                    <div class="loader mx-auto" id="loader"></div>
+                </div>
+            </div>
+
+            <!-- Transactions List -->
+            <div class="hello-kitty-card p-6 md:col-span-2">
+                <h2 class="text-xl font-bold text-pink-600 mb-4">
+                    <i class="bi bi-clock-history"></i> Recent Transactions
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="border-b-2 border-pink-200">
+                                <th class="text-left py-2">Time</th>
+                                <th class="text-left py-2">Service</th>
+                                <th class="text-left py-2">Description</th>
+                                <th class="text-left py-2">Qty</th>
+                                <th class="text-left py-2">Price</th>
+                                <th class="text-left py-2">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsList">
+                            <!-- Transactions will be added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize app data
+        let transactions = [];
+        const appSlug = 'cyber-shop-' + Math.random().toString(36).substr(2, 9);
+        
+        // Handle form submission
+        document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+
+            const serviceType = document.getElementById('serviceType').value;
+            const description = document.getElementById('description').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const price = parseFloat(document.getElementById('price').value);
+            const total = quantity * price;
+
+            const transaction = {
+                timestamp: new Date(),
+                serviceType,
+                description,
+                quantity,
+                price,
+                total
+            };
+
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer dP4m0Sjx6LOwW3k0TsTEzizU2Jg1',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug,
+                        action: 'create',
+                        collection: 'transactions',
+                        data: transaction
+                    })
+                });
+
+                if (response.ok) {
+                    transactions.unshift(transaction);
+                    updateUI();
+                    e.target.reset();
+                }
+            } catch (error) {
+                console.error('Error saving transaction:', error);
+                alert('Failed to save transaction. Please try again.');
+            }
+
+            loader.style.display = 'none';
+        });
+
+        // Update UI with transaction data
+        function updateUI() {
+            const totalRevenue = transactions.reduce((sum, t) => sum + t.total, 0);
+            document.getElementById('totalRevenue').textContent = `₹${totalRevenue.toFixed(2)}`;
+
+            // Update service-wise summaries
+            const services = ['Photocopy', 'Lamination', 'Online Form', 'Money Transfer'];
+            services.forEach(service => {
+                const serviceTotal = transactions
+                    .filter(t => t.serviceType === service)
+                    .reduce((sum, t) => sum + t.total, 0);
+                const summaryId = service.toLowerCase().replace(' ', '') + 'Summary';
+                document.getElementById(summaryId).textContent = `₹${serviceTotal.toFixed(2)}`;
+            });
+
+            // Update transactions list
+            const transactionsList = document.getElementById('transactionsList');
+            transactionsList.innerHTML = transactions
+                .slice(0, 10)
+                .map(t => `
+                    <tr class="border-b border-pink-100">
+                        <td class="py-2">${t.timestamp.toLocaleTimeString()}</td>
+                        <td class="py-2"><span class="category-pill">${t.serviceType}</span></td>
+                        <td class="py-2">${t.description}</td>
+                        <td class="py-2">${t.quantity}</td>
+                        <td class="py-2">₹${t.price.toFixed(2)}</td>
+                        <td class="py-2">₹${t.total.toFixed(2)}</td>
+                    </tr>
+                `)
+                .join('');
+        }
+
+        // Load existing transactions
+        async function loadTransactions() {
+            const loader = document.getElementById('loader');
+            loader.style.display = 'block';
+
+            try {
+                const response = await fetch('https://r0c8kgwocscg8gsokogwwsw4.zetaverse.one/mongodb', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer dP4m0Sjx6LOwW3k0TsTEzizU2Jg1',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        appSlug,
+                        action: 'read',
+                        collection: 'transactions'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    transactions = data.result.read.map(t => ({
+                        ...t.data,
+                        timestamp: new Date(t.data.timestamp)
+                    }));
+                    updateUI();
+                }
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+            }
+
+            loader.style.display = 'none';
+        }
+
+        loadTransactions();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
